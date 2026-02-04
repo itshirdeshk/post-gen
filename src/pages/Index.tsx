@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { LandingPage } from "@/pages/LandingPage";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { BrandCreator } from "@/components/brand/BrandCreator";
 import { BrandOverview } from "@/components/brand/BrandOverview";
 import { PostGenerator } from "@/components/post/PostGenerator";
@@ -58,10 +58,10 @@ const DEMO_BRAND: BrandBundle = {
   website_url: "https://postgen.ai",
 };
 
-type View = "dashboard" | "create-brand" | "generate" | "settings";
+type View = "landing" | "dashboard" | "create-brand" | "generate" | "settings";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<View>("dashboard");
+  const [currentView, setCurrentView] = useState<View>("landing");
   const [brand, setBrand] = useState<BrandBundle | null>(null);
 
   const handleBrandComplete = () => {
@@ -73,6 +73,15 @@ const Index = () => {
     setCurrentView(view as View);
   };
 
+  const handleGetStarted = () => {
+    setCurrentView("create-brand");
+  };
+
+  // Show landing page when no brand and on landing view
+  if (currentView === "landing" && !brand) {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
+
   return (
     <AppLayout 
       currentView={currentView} 
@@ -80,20 +89,6 @@ const Index = () => {
       hasBrand={!!brand}
     >
       <AnimatePresence mode="wait">
-        {currentView === "dashboard" && !brand && (
-          <motion.div
-            key="hero"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <DashboardHero 
-              onCreateBrand={() => setCurrentView("create-brand")}
-              hasBrand={false}
-            />
-          </motion.div>
-        )}
-
         {currentView === "dashboard" && brand && (
           <motion.div
             key="dashboard"
@@ -156,7 +151,7 @@ const Index = () => {
           >
             <BrandCreator 
               onComplete={handleBrandComplete}
-              onBack={() => setCurrentView("dashboard")}
+              onBack={() => setCurrentView(brand ? "dashboard" : "landing")}
             />
           </motion.div>
         )}
