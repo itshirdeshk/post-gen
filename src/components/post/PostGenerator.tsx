@@ -11,7 +11,8 @@ import {
   Instagram,
    Facebook,
    Copy,
-   Check
+  Check,
+  Pencil
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -30,6 +31,7 @@ import {
  import { generatePost } from "@/lib/api/posts";
 import type { Platform, PostContext, GeneratedPost } from "@/types/brand";
  import type { BrandBundle } from "@/types/brand";
+import { ManualPostEditor } from "./ManualPostEditor";
 
 interface PostGeneratorProps {
   onBack: () => void;
@@ -62,7 +64,7 @@ const TONES = [
 ];
 
  export function PostGenerator({ onBack, brand }: PostGeneratorProps) {
-  const [mode, setMode] = useState<"coop" | "full_ai">("coop");
+  const [mode, setMode] = useState<"coop" | "full_ai" | "manual">("coop");
   const [context, setContext] = useState<Partial<PostContext>>({
     platform: "linkedin",
   });
@@ -94,7 +96,7 @@ const TONES = [
          const response = await generatePost({
            brand_bundle_id: brand.id,
            platform: context.platform || "linkedin",
-           method: mode,
+          method: mode === "manual" ? "coop" : mode,
            topic: context.topic,
            goal: context.goal,
            cta: context.cta,
@@ -175,7 +177,7 @@ const TONES = [
             {/* Mode Selection */}
             <GlassCard>
               <Tabs value={mode} onValueChange={(v) => setMode(v as "coop" | "full_ai")}>
-                <TabsList className="grid w-full grid-cols-2 bg-secondary/50">
+                <TabsList className="grid w-full grid-cols-3 bg-secondary/50">
                   <TabsTrigger value="coop" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <Users className="w-4 h-4 mr-2" />
                     Co-Op Mode
@@ -183,6 +185,10 @@ const TONES = [
                   <TabsTrigger value="full_ai" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <Wand2 className="w-4 h-4 mr-2" />
                     Full AI
+                  </TabsTrigger>
+                  <TabsTrigger value="manual" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Manual
                   </TabsTrigger>
                 </TabsList>
 
@@ -307,32 +313,39 @@ const TONES = [
                     </div>
                   </div>
                 </TabsContent>
+
+                <TabsContent value="manual" className="mt-6">
+                  <ManualPostEditor brand={brand} onSave={() => setPosts([])} />
+                </TabsContent>
               </Tabs>
 
               {/* Generate Button */}
-              <Button 
-                variant="hero" 
-                size="lg" 
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="w-full mt-6"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    Generate 3 Posts
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </Button>
+              {mode !== "manual" && (
+                <Button 
+                  variant="hero" 
+                  size="lg" 
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
+                  className="w-full mt-6"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      Generate 3 Posts
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </Button>
+              )}
             </GlassCard>
           </div>
 
           {/* Right: Results */}
+          {mode !== "manual" && (
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Generated Posts</h3>
             
@@ -438,6 +451,7 @@ const TONES = [
               )}
             </AnimatePresence>
           </div>
+          )}
         </div>
       </div>
     </section>

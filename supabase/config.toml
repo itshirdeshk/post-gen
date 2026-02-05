@@ -5,3 +5,6 @@ project_id = "xffocpfgnioremvefmgn"
  
  [functions.generate-post]
  verify_jwt = false
+
+[functions.generate-post-image]
+verify_jwt = false
