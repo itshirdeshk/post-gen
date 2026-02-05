@@ -1,4 +1,4 @@
- import { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   Menu, 
@@ -8,98 +8,103 @@ import {
   FileText,
   Settings,
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Info
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GradientText } from "@/components/ui/GradientText";
- import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
   currentView?: string;
   onNavigate?: (view: string) => void;
   hasBrand?: boolean;
-   onSignOut?: () => void;
+  onSignOut?: () => void;
 }
 
 const NAV_ITEMS = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "generate", label: "Generate Posts", icon: FileText },
-  { id: "settings", label: "Settings", icon: Settings },
+  { id: "dashboard", label: "Dashboard" },
+  { id: "generate", label: "Brand Context" },
+  { id: "settings", label: "Library" },
 ];
 
- export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignOut }: AppLayoutProps) {
+export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignOut }: AppLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-   const { signOut, user } = useAuth();
- 
-   const handleSignOut = async () => {
-     await signOut();
-     onSignOut?.();
-   };
+  const { signOut, user } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    onSignOut?.();
+  };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary-foreground" />
+            {/* Logo and Nav */}
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="font-bold text-lg">PostGen</span>
               </div>
-              <span className="font-bold text-lg hidden sm:block">
-                <GradientText>PostGen</GradientText>
-              </span>
+
+              {/* Desktop Nav Tabs */}
+              <div className="hidden md:flex items-center">
+                <div className="h-8 w-px bg-border mr-6" />
+                <div className="flex items-center gap-1">
+                  {NAV_ITEMS.map((item) => {
+                    const isActive = currentView === item.id;
+                    const isDisabled = !hasBrand && item.id === "generate";
+                    
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => !isDisabled && onNavigate?.(item.id)}
+                        disabled={isDisabled}
+                        className={`px-4 py-2 text-sm font-medium transition-colors rounded-md ${
+                          isActive 
+                            ? "text-foreground border-b-2 border-primary" 
+                            : isDisabled
+                            ? "text-muted-foreground/50 cursor-not-allowed"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-1">
-              {NAV_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const isActive = currentView === item.id;
-                const isDisabled = !hasBrand && item.id === "generate";
-                
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => !isDisabled && onNavigate?.(item.id)}
-                    disabled={isDisabled}
-                    className={`
-                      flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
-                      ${isActive 
-                        ? "bg-primary/10 text-primary" 
-                        : isDisabled
-                        ? "text-muted-foreground/50 cursor-not-allowed"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"}
-                    `}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {item.label}
-                  </button>
-                );
-              })}
-             
-             {user && (
-               <button
-                 onClick={handleSignOut}
-                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all ml-2"
-               >
-                 <LogOut className="w-4 h-4" />
-                 Sign Out
-               </button>
-             )}
-            </nav>
+            {/* Right side */}
+            <div className="flex items-center gap-4">
+              {user && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="hidden md:flex items-center gap-2 text-muted-foreground"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
+              )}
 
-            {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -109,11 +114,10 @@ const NAV_ITEMS = [
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="md:hidden border-t border-border"
+            className="md:hidden border-t border-border/50"
           >
             <nav className="container mx-auto px-4 py-4 space-y-1">
               {NAV_ITEMS.map((item) => {
-                const Icon = item.icon;
                 const isActive = currentView === item.id;
                 const isDisabled = !hasBrand && item.id === "generate";
                 
@@ -127,19 +131,15 @@ const NAV_ITEMS = [
                       }
                     }}
                     disabled={isDisabled}
-                    className={`
-                      flex items-center justify-between w-full px-4 py-3 rounded-lg transition-all
-                      ${isActive 
+                    className={`flex items-center justify-between w-full px-4 py-3 rounded-lg transition-all ${
+                      isActive 
                         ? "bg-primary/10 text-primary" 
                         : isDisabled
                         ? "text-muted-foreground/50"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"}
-                    `}
+                        : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <Icon className="w-5 h-5" />
-                      {item.label}
-                    </div>
+                    <span>{item.label}</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 );
@@ -166,14 +166,23 @@ const NAV_ITEMS = [
       </header>
 
       {/* Main Content */}
-      <main className="pt-16">
+      <main className="flex-1">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 mt-20">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 PostGen. AI-powered content that sounds like you.</p>
+      <footer className="border-t border-border/50 py-4 px-4">
+        <div className="container mx-auto flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Info className="w-4 h-4" />
+            <span>Need Help?</span>
+            <a href="#" className="hover:text-foreground transition-colors">
+              Learn More
+            </a>
+          </div>
+          <div>
+            © 2025 PostGen AI
+          </div>
         </div>
       </footer>
     </div>
