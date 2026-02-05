@@ -73,27 +73,61 @@
  
      console.log("Analyzing brand for URL:", formattedUrl);
  
-     // Fetch website content
+    // Fetch website content using Firecrawl for better scraping
      let websiteContent = "";
+    let brandingData: Record<string, unknown> | null = null;
+    
+    const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
+    
      try {
-       const response = await fetch(formattedUrl, {
-         headers: {
-           "User-Agent": "Mozilla/5.0 (compatible; BrandAnalyzer/1.0)",
-         },
-       });
-       if (response.ok) {
-         const html = await response.text();
-         // Extract text content from HTML (basic extraction)
-         websiteContent = html
-           .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-           .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-           .replace(/<[^>]+>/g, " ")
-           .replace(/\s+/g, " ")
-           .trim()
-           .slice(0, 15000); // Limit content length
+      if (FIRECRAWL_API_KEY) {
+        console.log("Using Firecrawl for enhanced scraping");
+        
+        const firecrawlResponse = await fetch("https://api.firecrawl.dev/v1/scrape", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${FIRECRAWL_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url: formattedUrl,
+            formats: ["markdown", "branding"],
+            onlyMainContent: false,
+            waitFor: 3000,
+          }),
+        });
+        
+        if (firecrawlResponse.ok) {
+          const firecrawlData = await firecrawlResponse.json();
+          websiteContent = firecrawlData.data?.markdown || firecrawlData.markdown || "";
+          brandingData = firecrawlData.data?.branding || firecrawlData.branding || null;
+          console.log("Firecrawl scrape successful, content length:", websiteContent.length);
+        } else {
+          console.log("Firecrawl failed, falling back to basic fetch:", firecrawlResponse.status);
+        }
+      }
+      
+      // Fallback to basic fetch if Firecrawl unavailable or failed
+      if (!websiteContent) {
+        console.log("Using basic fetch for scraping");
+        const response = await fetch(formattedUrl, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (compatible; BrandAnalyzer/1.0)",
+          },
+        });
+        if (response.ok) {
+          const html = await response.text();
+          websiteContent = html
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 20000);
+        }
        }
      } catch (fetchError) {
-       console.log("Could not fetch website, proceeding with URL analysis:", fetchError);
+      console.log("Scraping error, proceeding with URL analysis:", fetchError);
      }
  
      // Use Lovable AI to analyze brand
@@ -111,7 +145,14 @@
  URL: ${formattedUrl}
  
  Website Content:
- ${websiteContent || "Could not fetch website content. Please infer brand attributes from the URL and domain name."}
+${websiteContent.slice(0, 25000) || "Could not fetch website content. Please infer brand attributes from the URL and domain name."}
+
+${brandingData ? `
+Brand Visual Identity Data:
+- Logo: ${(brandingData as Record<string, unknown>).logo || "Not found"}
+- Colors: ${JSON.stringify((brandingData as Record<string, unknown>).colors || {})}
+- Fonts: ${JSON.stringify((brandingData as Record<string, unknown>).fonts || [])}
+` : ""}
  
  Extract and return the brand bundle.`;
  

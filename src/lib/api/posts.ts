@@ -69,3 +69,91 @@
    const { error } = await supabase.from("generated_posts").delete().eq("id", id);
    return !error;
  }
+
+// Image Generation
+interface GenerateImageRequest {
+  brand_bundle_id: string;
+  prompt: string;
+  style?: "minimal" | "bold" | "professional" | "creative" | "tech";
+  aspect_ratio?: "1:1" | "16:9" | "9:16" | "4:5";
+  post_id?: string;
+}
+
+interface GenerateImageResponse {
+  success: boolean;
+  data?: {
+    image_url: string;
+    prompt: string;
+    style: string;
+    aspect_ratio: string;
+    post_id?: string;
+  };
+  error?: string;
+}
+
+export async function generatePostImage(request: GenerateImageRequest): Promise<GenerateImageResponse> {
+  const { data, error } = await supabase.functions.invoke("generate-post-image", {
+    body: request,
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  if (data?.error) {
+    return { success: false, error: data.error };
+  }
+
+  return { success: true, data: data.data };
+}
+
+// Manual Post (save to database without AI generation)
+export async function saveManualPost(post: {
+  brand_bundle_id: string;
+  platform: Platform;
+  content: string;
+  topic?: string;
+}): Promise<GeneratePostResponse> {
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
+
+  const { data, error } = await supabase
+    .from("generated_posts")
+    .insert([
+      {
+        brand_bundle_id: post.brand_bundle_id,
+        platform: post.platform,
+        content: post.content,
+        topic: post.topic,
+        user_id: user.id,
+        method: "coop",
+        angle: "custom",
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return {
+    success: true,
+    data: {
+      id: data.id,
+      brand_bundle_id: data.brand_bundle_id,
+      method: data.method as PostMethod,
+      platform: data.platform as Platform,
+      content: data.content,
+      metadata: {
+        topic: data.topic,
+        angle: data.angle,
+        hashtags: data.hashtags || [],
+      },
+      created_at: data.created_at,
+    },
+  };
+}
