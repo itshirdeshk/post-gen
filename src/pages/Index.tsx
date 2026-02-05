@@ -1,95 +1,108 @@
-import { useState } from "react";
+ import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LandingPage } from "@/pages/LandingPage";
+ import { AuthPage } from "@/pages/AuthPage";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { BrandCreator } from "@/components/brand/BrandCreator";
 import { BrandOverview } from "@/components/brand/BrandOverview";
 import { PostGenerator } from "@/components/post/PostGenerator";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
-import { Wand2, ArrowRight } from "lucide-react";
+ import { Wand2, ArrowRight, Loader2 } from "lucide-react";
+ import { useAuth } from "@/contexts/AuthContext";
+ import { fetchBrandBundles } from "@/lib/api/brand";
 import type { BrandBundle } from "@/types/brand";
 
-// Demo brand data
-const DEMO_BRAND: BrandBundle = {
-  id: "demo-brand",
-  identity: {
-    brand_name: "PostGen AI",
-    logo_url: null,
-  },
-  brand_dna: {
-    mission: "Empower businesses to create authentic, on-brand content at scale without sacrificing quality or voice.",
-    vision: "A world where every brand can communicate consistently and effectively across all channels.",
-    values: ["Authenticity", "Efficiency", "Innovation", "Quality"],
-  },
-  offerings: [
-    { name: "Brand Bundle Creation", description: "AI-powered brand analysis from your website" },
-    { name: "Co-Op Post Generation", description: "Guided AI content creation with your input" },
-    { name: "Full AI Generation", description: "Autonomous content creation based on brand DNA" },
-  ],
-  voice: {
-    tone: "Professional yet approachable, confident without being arrogant",
-    style: "Clear, concise, and action-oriented with occasional wit",
-  },
-  audience: {
-    primary: "Marketing managers and content creators at B2B companies",
-    pain_points: [
-      "Struggling to maintain consistent brand voice across channels",
-      "Spending too much time creating social content",
-      "Generic AI content that doesn't sound on-brand",
-    ],
-  },
-  proof: [
-    "Reduced content creation time by 80%",
-    "Increased engagement rates by 3x",
-    "Trusted by 500+ marketing teams",
-  ],
-  cta_library: [
-    "Start generating content today",
-    "Analyze your brand for free",
-    "See the difference AI can make",
-  ],
-  keywords: ["ContentMarketing", "AIForBusiness", "BrandStrategy", "SocialMedia", "MarketingAutomation"],
-  confidence: {
-    mission: 0.92,
-    voice: 0.87,
-    offerings: 0.95,
-  },
-  website_url: "https://postgen.ai",
-};
-
-type View = "landing" | "dashboard" | "create-brand" | "generate" | "settings";
+ type View = "landing" | "auth" | "dashboard" | "create-brand" | "generate" | "settings";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<View>("landing");
-  const [brand, setBrand] = useState<BrandBundle | null>(null);
+   const [brands, setBrands] = useState<BrandBundle[]>([]);
+   const [selectedBrand, setSelectedBrand] = useState<BrandBundle | null>(null);
+   const [loadingBrands, setLoadingBrands] = useState(false);
+   const { user, loading: authLoading } = useAuth();
 
-  const handleBrandComplete = () => {
-    setBrand(DEMO_BRAND);
-    setCurrentView("dashboard");
+   // Load brands when user is authenticated
+   useEffect(() => {
+     if (user) {
+       loadBrands();
+     } else {
+       setBrands([]);
+       setSelectedBrand(null);
+     }
+   }, [user]);
+ 
+   const loadBrands = async () => {
+     setLoadingBrands(true);
+     try {
+       const fetchedBrands = await fetchBrandBundles();
+       setBrands(fetchedBrands);
+       if (fetchedBrands.length > 0) {
+         setSelectedBrand(fetchedBrands[0]);
+       }
+     } finally {
+       setLoadingBrands(false);
+     }
   };
+ 
+   const handleBrandComplete = async () => {
+     await loadBrands();
+     setCurrentView("dashboard");
+   };
+ 
+   const handleAuthSuccess = () => {
+     setCurrentView("dashboard");
+   };
 
   const handleNavigate = (view: string) => {
     setCurrentView(view as View);
   };
 
   const handleGetStarted = () => {
-    setCurrentView("create-brand");
+     if (user) {
+       setCurrentView("create-brand");
+     } else {
+       setCurrentView("auth");
+     }
   };
 
-  // Show landing page when no brand and on landing view
-  if (currentView === "landing" && !brand) {
+   // Show loading spinner while checking auth
+   if (authLoading) {
+     return (
+       <div className="min-h-screen flex items-center justify-center">
+         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+       </div>
+     );
+   }
+ 
+   // Show landing page when not authenticated and on landing view
+   if (currentView === "landing" && !user) {
     return <LandingPage onGetStarted={handleGetStarted} />;
   }
+ 
+   // Show auth page
+   if (currentView === "auth" && !user) {
+     return <AuthPage onSuccess={handleAuthSuccess} />;
+   }
+ 
+   // Redirect to dashboard if user is authenticated and on landing/auth
+   if (user && (currentView === "landing" || currentView === "auth")) {
+     setCurrentView("dashboard");
+   }
 
   return (
     <AppLayout 
       currentView={currentView} 
       onNavigate={handleNavigate}
-      hasBrand={!!brand}
+       hasBrand={brands.length > 0}
+       onSignOut={() => {
+         setBrands([]);
+         setSelectedBrand(null);
+         setCurrentView("landing");
+       }}
     >
       <AnimatePresence mode="wait">
-        {currentView === "dashboard" && brand && (
+         {currentView === "dashboard" && (
           <motion.div
             key="dashboard"
             initial={{ opacity: 0 }}
@@ -97,6 +110,23 @@ const Index = () => {
             exit={{ opacity: 0 }}
             className="container mx-auto px-4 py-8"
           >
+             {loadingBrands ? (
+               <div className="flex items-center justify-center py-20">
+                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
+               </div>
+             ) : brands.length === 0 ? (
+               <div className="text-center py-20">
+                 <h2 className="text-2xl font-bold mb-4">Welcome to PostGen AI!</h2>
+                 <p className="text-muted-foreground mb-6">
+                   Create your first Brand Bundle to start generating on-brand content.
+                 </p>
+                 <Button variant="hero" onClick={() => setCurrentView("create-brand")}>
+                   Create Brand Bundle
+                   <ArrowRight className="w-5 h-5" />
+                 </Button>
+               </div>
+             ) : (
+               <>
             {/* Quick Actions */}
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
@@ -125,8 +155,8 @@ const Index = () => {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold">Re-analyze Brand</h3>
-                      <p className="text-sm text-muted-foreground">Update your brand bundle</p>
+                       <h3 className="font-semibold">Add New Brand</h3>
+                       <p className="text-sm text-muted-foreground">Analyze another website</p>
                     </div>
                     <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
                   </div>
@@ -135,10 +165,12 @@ const Index = () => {
             </div>
 
             {/* Brand Overview */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Your Brand Bundle</h2>
-              <BrandOverview brand={brand} />
-            </div>
+               <div>
+                 <h2 className="text-xl font-semibold mb-4">Your Brand Bundle</h2>
+                 {selectedBrand && <BrandOverview brand={selectedBrand} />}
+               </div>
+               </>
+             )}
           </motion.div>
         )}
 
@@ -151,7 +183,7 @@ const Index = () => {
           >
             <BrandCreator 
               onComplete={handleBrandComplete}
-              onBack={() => setCurrentView(brand ? "dashboard" : "landing")}
+               onBack={() => setCurrentView(brands.length > 0 ? "dashboard" : "landing")}
             />
           </motion.div>
         )}
@@ -163,7 +195,10 @@ const Index = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <PostGenerator onBack={() => setCurrentView("dashboard")} />
+             <PostGenerator 
+               brand={selectedBrand}
+               onBack={() => setCurrentView("dashboard")} 
+             />
           </motion.div>
         )}
 

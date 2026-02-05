@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { GradientText } from "@/components/ui/GradientText";
+ import { useToast } from "@/hooks/use-toast";
+ import { analyzeBrand } from "@/lib/api/brand";
 import type { ScrapingProgress, GenerationStep } from "@/types/brand";
 
 interface BrandCreatorProps {
@@ -13,9 +15,9 @@ interface BrandCreatorProps {
 }
 
 const STEPS = [
-  { step: "scraping" as GenerationStep, label: "Scanning website", duration: 2000 },
-  { step: "analyzing" as GenerationStep, label: "Extracting brand DNA", duration: 3000 },
-  { step: "generating" as GenerationStep, label: "Building Brand Bundle", duration: 2000 },
+   { step: "scraping" as GenerationStep, label: "Scanning website" },
+   { step: "analyzing" as GenerationStep, label: "Extracting brand DNA" },
+   { step: "generating" as GenerationStep, label: "Building Brand Bundle" },
 ];
 
 export function BrandCreator({ onComplete, onBack }: BrandCreatorProps) {
@@ -26,6 +28,7 @@ export function BrandCreator({ onComplete, onBack }: BrandCreatorProps) {
     progress: 0,
   });
   const [error, setError] = useState<string | null>(null);
+   const { toast } = useToast();
 
   const isValidUrl = (urlString: string) => {
     try {
@@ -44,30 +47,70 @@ export function BrandCreator({ onComplete, onBack }: BrandCreatorProps) {
     }
 
     setError(null);
-    
-    // Simulate the brand extraction process
-    // In production, this would call the backend APIs
-    for (let i = 0; i < STEPS.length; i++) {
-      const currentStep = STEPS[i];
-      setProgress({
-        step: currentStep.step,
-        message: currentStep.label,
-        progress: ((i + 1) / STEPS.length) * 100,
-      });
-      await new Promise((resolve) => setTimeout(resolve, currentStep.duration));
-    }
 
-    setProgress({
-      step: "complete",
-      message: "Brand Bundle created!",
-      progress: 100,
+     // Start progress animation
+     setProgress({
+       step: "scraping",
+       message: "Scanning website",
+       progress: 10,
     });
 
-    // Brief delay before transitioning
-    setTimeout(onComplete, 1000);
+     // Simulate progress while waiting for API
+     const progressInterval = setInterval(() => {
+       setProgress((prev) => {
+         if (prev.progress < 30) {
+           return { ...prev, step: "scraping", message: "Scanning website", progress: prev.progress + 5 };
+         } else if (prev.progress < 60) {
+           return { ...prev, step: "analyzing", message: "Extracting brand DNA", progress: prev.progress + 3 };
+         } else if (prev.progress < 90) {
+           return { ...prev, step: "generating", message: "Building Brand Bundle", progress: prev.progress + 2 };
+         }
+         return prev;
+       });
+     }, 500);
+ 
+     try {
+       const response = await analyzeBrand(url);
+ 
+       clearInterval(progressInterval);
+ 
+       if (response.success) {
+         setProgress({
+           step: "complete",
+           message: "Brand Bundle created!",
+           progress: 100,
+         });
+ 
+         toast({
+           title: "Brand Bundle Created!",
+           description: `Successfully analyzed ${response.data.brand_name}`,
+         });
+ 
+         // Brief delay before transitioning
+         setTimeout(onComplete, 1000);
+       } else {
+         setProgress({ step: "error", message: response.error || "Analysis failed", progress: 0 });
+         setError(response.error || "Failed to analyze brand. Please try again.");
+         toast({
+           title: "Analysis failed",
+           description: response.error || "Please try again.",
+           variant: "destructive",
+         });
+       }
+     } catch (err) {
+       clearInterval(progressInterval);
+       console.error("Error analyzing brand:", err);
+       setProgress({ step: "error", message: "An error occurred", progress: 0 });
+       setError("An unexpected error occurred. Please try again.");
+       toast({
+         title: "Error",
+         description: "An unexpected error occurred.",
+         variant: "destructive",
+       });
+     }
   };
 
-  const isProcessing = ["scraping", "analyzing", "generating"].includes(progress.step);
+   const isProcessing = ["scraping", "analyzing", "generating"].includes(progress.step) && progress.step !== "error";
   const isComplete = progress.step === "complete";
 
   return (

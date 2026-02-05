@@ -1,1 +1,7 @@
 project_id = "xffocpfgnioremvefmgn"
+ 
+ [functions.analyze-brand]
+ verify_jwt = false
+ 
+ [functions.generate-post]
+ verify_jwt = false

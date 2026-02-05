@@ -14,7 +14,161 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      brand_bundles: {
+        Row: {
+          brand_name: string
+          brand_values: string[] | null
+          confidence_mission: number | null
+          confidence_offerings: number | null
+          confidence_voice: number | null
+          created_at: string
+          cta_library: string[] | null
+          id: string
+          keywords: string[] | null
+          logo_url: string | null
+          mission: string | null
+          offerings: Json | null
+          pain_points: string[] | null
+          primary_audience: string | null
+          proof: string[] | null
+          style: string | null
+          tone: string | null
+          updated_at: string
+          user_id: string
+          vision: string | null
+          website_url: string | null
+        }
+        Insert: {
+          brand_name: string
+          brand_values?: string[] | null
+          confidence_mission?: number | null
+          confidence_offerings?: number | null
+          confidence_voice?: number | null
+          created_at?: string
+          cta_library?: string[] | null
+          id?: string
+          keywords?: string[] | null
+          logo_url?: string | null
+          mission?: string | null
+          offerings?: Json | null
+          pain_points?: string[] | null
+          primary_audience?: string | null
+          proof?: string[] | null
+          style?: string | null
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+          vision?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          brand_name?: string
+          brand_values?: string[] | null
+          confidence_mission?: number | null
+          confidence_offerings?: number | null
+          confidence_voice?: number | null
+          created_at?: string
+          cta_library?: string[] | null
+          id?: string
+          keywords?: string[] | null
+          logo_url?: string | null
+          mission?: string | null
+          offerings?: Json | null
+          pain_points?: string[] | null
+          primary_audience?: string | null
+          proof?: string[] | null
+          style?: string | null
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+          vision?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      generated_posts: {
+        Row: {
+          angle: string | null
+          brand_bundle_id: string
+          content: string
+          created_at: string
+          cta: string | null
+          goal: string | null
+          hashtags: string[] | null
+          id: string
+          method: Database["public"]["Enums"]["post_method"]
+          platform: Database["public"]["Enums"]["platform"]
+          topic: string | null
+          user_id: string
+        }
+        Insert: {
+          angle?: string | null
+          brand_bundle_id: string
+          content: string
+          created_at?: string
+          cta?: string | null
+          goal?: string | null
+          hashtags?: string[] | null
+          id?: string
+          method: Database["public"]["Enums"]["post_method"]
+          platform: Database["public"]["Enums"]["platform"]
+          topic?: string | null
+          user_id: string
+        }
+        Update: {
+          angle?: string | null
+          brand_bundle_id?: string
+          content?: string
+          created_at?: string
+          cta?: string | null
+          goal?: string | null
+          hashtags?: string[] | null
+          id?: string
+          method?: Database["public"]["Enums"]["post_method"]
+          platform?: Database["public"]["Enums"]["platform"]
+          topic?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_posts_brand_bundle_id_fkey"
+            columns: ["brand_bundle_id"]
+            isOneToOne: false
+            referencedRelation: "brand_bundles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +177,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      platform: "linkedin" | "twitter" | "instagram" | "facebook"
+      post_method: "coop" | "full_ai"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +305,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      platform: ["linkedin", "twitter", "instagram", "facebook"],
+      post_method: ["coop", "full_ai"],
+    },
   },
 } as const

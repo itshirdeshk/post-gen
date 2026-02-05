@@ -1,4 +1,4 @@
-import { useState } from "react";
+ import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   Menu, 
@@ -12,12 +12,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GradientText } from "@/components/ui/GradientText";
+ import { useAuth } from "@/contexts/AuthContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
   currentView?: string;
   onNavigate?: (view: string) => void;
   hasBrand?: boolean;
+   onSignOut?: () => void;
 }
 
 const NAV_ITEMS = [
@@ -26,8 +28,14 @@ const NAV_ITEMS = [
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
-export function AppLayout({ children, currentView, onNavigate, hasBrand }: AppLayoutProps) {
+ export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignOut }: AppLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+   const { signOut, user } = useAuth();
+ 
+   const handleSignOut = async () => {
+     await signOut();
+     onSignOut?.();
+   };
 
   return (
     <div className="min-h-screen">
@@ -71,6 +79,16 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand }: AppLa
                   </button>
                 );
               })}
+             
+             {user && (
+               <button
+                 onClick={handleSignOut}
+                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all ml-2"
+               >
+                 <LogOut className="w-4 h-4" />
+                 Sign Out
+               </button>
+             )}
             </nav>
 
             {/* Mobile Menu Button */}
@@ -126,6 +144,22 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand }: AppLa
                   </button>
                 );
               })}
+             
+             {user && (
+               <button
+                 onClick={() => {
+                   handleSignOut();
+                   setMobileMenuOpen(false);
+                 }}
+                 className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+               >
+                 <div className="flex items-center gap-3">
+                   <LogOut className="w-5 h-5" />
+                   Sign Out
+                 </div>
+                 <ChevronRight className="w-4 h-4" />
+               </button>
+             )}
             </nav>
           </motion.div>
         )}

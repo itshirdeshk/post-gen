@@ -9,7 +9,9 @@ import {
   Linkedin,
   Twitter,
   Instagram,
-  Facebook
+   Facebook,
+   Copy,
+   Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -24,10 +26,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+ import { useToast } from "@/hooks/use-toast";
+ import { generatePost } from "@/lib/api/posts";
 import type { Platform, PostContext, GeneratedPost } from "@/types/brand";
+ import type { BrandBundle } from "@/types/brand";
 
 interface PostGeneratorProps {
   onBack: () => void;
+   brand: BrandBundle | null;
 }
 
 const PLATFORMS: { id: Platform; name: string; icon: React.ElementType }[] = [
@@ -55,35 +61,7 @@ const TONES = [
   "Conversational",
 ];
 
-// Demo generated posts
-const DEMO_POSTS: GeneratedPost[] = [
-  {
-    id: "1",
-    brand_bundle_id: "demo",
-    method: "coop",
-    platform: "linkedin",
-    content: "🚀 The future of content creation isn't about working harder—it's about working smarter.\n\nWe've spent months building an AI that truly understands your brand. Not generic content. YOUR content.\n\nOne website scan. Infinite on-brand posts.\n\nStop wrestling with writer's block. Start scaling your voice.\n\n#ContentMarketing #AIForBusiness #BrandStrategy",
-    metadata: { topic: "Product Launch", hashtags: ["ContentMarketing", "AIForBusiness"] }
-  },
-  {
-    id: "2",
-    brand_bundle_id: "demo",
-    method: "coop",
-    platform: "linkedin",
-    content: "Here's what nobody tells you about content marketing:\n\nThe brands winning on social aren't necessarily the loudest.\n\nThey're the most CONSISTENT.\n\nConsistency builds trust.\nTrust builds audience.\nAudience builds revenue.\n\nBut here's the catch—consistency is HARD when you're manually crafting every post.\n\nThat's why we built a smarter way. 🎯",
-    metadata: { topic: "Industry Insight", hashtags: ["Marketing", "Growth"] }
-  },
-  {
-    id: "3",
-    brand_bundle_id: "demo",
-    method: "coop",
-    platform: "linkedin",
-    content: "💡 Quick thought:\n\nYour brand already has a voice. It's in your website copy, your about page, your product descriptions.\n\nThe challenge? Translating that consistently across every platform, every day.\n\nWhat if AI could learn your voice once, then help you scale it everywhere?\n\nThat's exactly what we're building.\n\nDrop a 🔥 if you've struggled with content consistency.",
-    metadata: { topic: "Engagement", hashtags: ["BrandVoice", "ContentStrategy"] }
-  },
-];
-
-export function PostGenerator({ onBack }: PostGeneratorProps) {
+ export function PostGenerator({ onBack, brand }: PostGeneratorProps) {
   const [mode, setMode] = useState<"coop" | "full_ai">("coop");
   const [context, setContext] = useState<Partial<PostContext>>({
     platform: "linkedin",
@@ -91,18 +69,76 @@ export function PostGenerator({ onBack }: PostGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [posts, setPosts] = useState<GeneratedPost[]>([]);
   const [selectedPost, setSelectedPost] = useState<string | null>(null);
+   const [copiedId, setCopiedId] = useState<string | null>(null);
+   const { toast } = useToast();
 
   const handleGenerate = async () => {
+     if (!brand) {
+       toast({
+         title: "No brand selected",
+         description: "Please create a brand bundle first.",
+         variant: "destructive",
+       });
+       return;
+     }
+ 
     setIsGenerating(true);
     setPosts([]);
     setSelectedPost(null);
 
-    // Simulate AI generation
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+     try {
+       // Generate 3 posts
+       const generatedPosts: GeneratedPost[] = [];
+       
+       for (let i = 0; i < 3; i++) {
+         const response = await generatePost({
+           brand_bundle_id: brand.id,
+           platform: context.platform || "linkedin",
+           method: mode,
+           topic: context.topic,
+           goal: context.goal,
+           cta: context.cta,
+           tone_override: context.tone_override,
+         });
 
-    setPosts(DEMO_POSTS);
-    setIsGenerating(false);
+         if (response.success && response.data) {
+           generatedPosts.push(response.data);
+         } else if (response.error) {
+           toast({
+             title: "Generation failed",
+             description: response.error,
+             variant: "destructive",
+           });
+           break;
+         }
+       }
+ 
+       setPosts(generatedPosts);
+       
+       if (generatedPosts.length > 0) {
+         toast({
+           title: "Posts generated!",
+           description: `${generatedPosts.length} post${generatedPosts.length > 1 ? 's' : ''} created successfully.`,
+         });
+       }
+     } catch (error) {
+       console.error("Error generating posts:", error);
+       toast({
+         title: "Generation failed",
+         description: "An unexpected error occurred.",
+         variant: "destructive",
+       });
+     } finally {
+       setIsGenerating(false);
+     }
   };
+ 
+   const handleCopy = async (content: string, postId: string) => {
+     await navigator.clipboard.writeText(content);
+     setCopiedId(postId);
+     toast({ title: "Copied to clipboard!" });
+     setTimeout(() => setCopiedId(null), 2000);
+   };
 
   const handlePlatformChange = (platform: Platform) => {
     setContext((prev) => ({ ...prev, platform }));
@@ -361,8 +397,26 @@ export function PostGenerator({ onBack }: PostGeneratorProps) {
                             animate={{ opacity: 1, height: "auto" }}
                             className="mt-4 pt-4 border-t border-border flex gap-2"
                           >
-                            <Button variant="hero" size="sm">Copy to Clipboard</Button>
-                            <Button variant="outline" size="sm">Edit</Button>
+                           <Button 
+                             variant="hero" 
+                             size="sm"
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               handleCopy(post.content, post.id);
+                             }}
+                           >
+                             {copiedId === post.id ? (
+                               <>
+                                 <Check className="w-4 h-4" />
+                                 Copied!
+                               </>
+                             ) : (
+                               <>
+                                 <Copy className="w-4 h-4" />
+                                 Copy to Clipboard
+                               </>
+                             )}
+                           </Button>
                           </motion.div>
                         )}
                       </GlassCard>
