@@ -1,12 +1,30 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight, CheckCircle, Mail } from "lucide-react";
+import { Sparkles, ArrowRight, CheckCircle, Mail, Rocket, Calendar, Zap, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GradientText } from "@/components/ui/GradientText";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+
+const features = [
+  {
+    icon: Rocket,
+    title: "Brand Analysis",
+    description: "AI learns your unique voice and style from your website.",
+  },
+  {
+    icon: Zap,
+    title: "Multi-Platform",
+    description: "Generate posts for LinkedIn, Twitter, Instagram & more.",
+  },
+  {
+    icon: Calendar,
+    title: "Image Generation",
+    description: "Create stunning visuals tailored to your brand.",
+  },
+];
 
 export function WaitlistPage() {
   const [email, setEmail] = useState("");
@@ -63,84 +81,121 @@ export function WaitlistPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl" />
-      </div>
-
-      {/* Header */}
-      <header className="relative z-10 py-6 px-4">
-        <div className="container mx-auto flex items-center justify-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
+      {/* Header Navigation */}
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-xl">
-              <GradientText>PostGen AI</GradientText>
+            <span className="font-bold text-lg">PostGen AI</span>
+          </Link>
+          
+          <nav className="hidden md:flex items-center gap-6 text-sm">
+            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+              Home
+            </Link>
+            <span className="text-foreground font-medium border-b-2 border-primary pb-0.5">
+              Waitlist
             </span>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/">Back to Home</Link>
+            </Button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-xl">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-16">
+        <div className="w-full max-w-4xl">
+          {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
-              Coming Soon
-            </div>
-            
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              AI-Powered Posts That{" "}
-              <GradientText>Sound Like You</GradientText>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
+              What do you want to{" "}
+              <GradientText>create?</GradientText>
             </h1>
-            
-            <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              Generate on-brand social media content in seconds. 
-              Join the waitlist to get early access when we launch.
+            <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+              Join our waitlist to be first in line when we launch.
             </p>
           </motion.div>
 
+          {/* Feature Cards */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="grid md:grid-cols-3 gap-4 mb-12"
           >
-            <GlassCard className="p-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
+                  className="group relative p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all duration-300"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                  <div className="mt-4">
+                    <span className="inline-flex items-center text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-secondary/50 border border-border">
+                      Coming Soon
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+
+          {/* Signup Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="max-w-md mx-auto"
+          >
+            <div className="p-8 rounded-xl bg-card border border-border">
               {isSuccess ? (
-                <div className="text-center py-4">
+                <div className="text-center py-6">
                   <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-8 h-8 text-success" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">You're on the list!</h3>
+                  <h3 className="text-2xl font-semibold mb-2">You're on the list!</h3>
                   <p className="text-muted-foreground">
                     We'll send you an email when PostGen AI is ready for you.
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-semibold mb-2">Get Early Access</h3>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="text-center">
+                    <h3 className="text-2xl font-semibold mb-2">Get Early Access</h3>
                     <p className="text-sm text-muted-foreground">
                       Be the first to know when we launch
                     </p>
                   </div>
                   
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <Input
                       type="email"
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 h-12"
+                      className="pl-12 h-12 bg-secondary/50 border-border focus:border-primary"
                       disabled={isSubmitting}
                     />
                   </div>
@@ -167,33 +222,25 @@ export function WaitlistPage() {
                   </p>
                 </form>
               )}
-            </GlassCard>
-          </motion.div>
-
-          {/* Features Preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-12 grid grid-cols-3 gap-4 text-center"
-          >
-            {[
-              { label: "Brand Analysis", desc: "AI learns your voice" },
-              { label: "Multi-Platform", desc: "LinkedIn, Twitter, more" },
-              { label: "Image Generation", desc: "Stunning visuals" },
-            ].map((feature, i) => (
-              <div key={i} className="p-4">
-                <div className="font-semibold text-sm mb-1">{feature.label}</div>
-                <div className="text-xs text-muted-foreground">{feature.desc}</div>
-              </div>
-            ))}
+            </div>
           </motion.div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 text-center text-sm text-muted-foreground">
-        <p>© 2025 PostGen AI. All rights reserved.</p>
+      <footer className="border-t border-border/50 py-4 px-4">
+        <div className="container mx-auto flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Info className="w-4 h-4" />
+            <span>Need Help?</span>
+            <Link to="/" className="hover:text-foreground transition-colors">
+              Learn More
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            <span>© 2025 PostGen AI</span>
+          </div>
+        </div>
       </footer>
     </div>
   );
