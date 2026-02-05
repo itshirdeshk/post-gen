@@ -5,8 +5,9 @@
  import { BrowserRouter, Routes, Route } from "react-router-dom";
  import { ThemeProvider } from "@/components/theme/ThemeProvider";
  import { AuthProvider } from "@/contexts/AuthContext";
- import Index from "./pages/Index";
- import NotFound from "./pages/NotFound";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import { WaitlistPage } from "./pages/WaitlistPage";
  
  const queryClient = new QueryClient();
  
@@ -18,11 +19,12 @@
            <Toaster />
            <Sonner />
            <BrowserRouter>
-             <Routes>
-               <Route path="/" element={<Index />} />
-               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-               <Route path="*" element={<NotFound />} />
-             </Routes>
+            <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/waitlist" element={<WaitlistPage />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
            </BrowserRouter>
          </TooltipProvider>
        </AuthProvider>
