@@ -1,176 +1,218 @@
- import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LandingPage } from "@/pages/LandingPage";
- import { AuthPage } from "@/pages/AuthPage";
+import { AuthPage } from "@/pages/AuthPage";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { BrandCreator } from "@/components/brand/BrandCreator";
 import { BrandOverview } from "@/components/brand/BrandOverview";
 import { PostGenerator } from "@/components/post/PostGenerator";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/button";
- import { Wand2, ArrowRight, Loader2 } from "lucide-react";
- import { useAuth } from "@/contexts/AuthContext";
- import { fetchBrandBundles } from "@/lib/api/brand";
+import { Wand2, ArrowRight, Loader2, Rocket, Calendar, Image } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { fetchBrandBundles } from "@/lib/api/brand";
 import type { BrandBundle } from "@/types/brand";
 
- type View = "landing" | "auth" | "dashboard" | "create-brand" | "generate" | "settings";
+type View = "landing" | "auth" | "dashboard" | "create-brand" | "generate" | "settings";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<View>("landing");
-   const [brands, setBrands] = useState<BrandBundle[]>([]);
-   const [selectedBrand, setSelectedBrand] = useState<BrandBundle | null>(null);
-   const [loadingBrands, setLoadingBrands] = useState(false);
-   const { user, loading: authLoading } = useAuth();
+  const [brands, setBrands] = useState<BrandBundle[]>([]);
+  const [selectedBrand, setSelectedBrand] = useState<BrandBundle | null>(null);
+  const [loadingBrands, setLoadingBrands] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
-   // Load brands when user is authenticated
-   useEffect(() => {
-     if (user) {
-       loadBrands();
-     } else {
-       setBrands([]);
-       setSelectedBrand(null);
-     }
-   }, [user]);
- 
-   const loadBrands = async () => {
-     setLoadingBrands(true);
-     try {
-       const fetchedBrands = await fetchBrandBundles();
-       setBrands(fetchedBrands);
-       if (fetchedBrands.length > 0) {
-         setSelectedBrand(fetchedBrands[0]);
-       }
-     } finally {
-       setLoadingBrands(false);
-     }
+  // Load brands when user is authenticated
+  useEffect(() => {
+    if (user) {
+      loadBrands();
+    } else {
+      setBrands([]);
+      setSelectedBrand(null);
+    }
+  }, [user]);
+
+  const loadBrands = async () => {
+    setLoadingBrands(true);
+    try {
+      const fetchedBrands = await fetchBrandBundles();
+      setBrands(fetchedBrands);
+      if (fetchedBrands.length > 0) {
+        setSelectedBrand(fetchedBrands[0]);
+      }
+    } finally {
+      setLoadingBrands(false);
+    }
   };
- 
-   const handleBrandComplete = async () => {
-     await loadBrands();
-     setCurrentView("dashboard");
-   };
- 
-   const handleAuthSuccess = () => {
-     setCurrentView("dashboard");
-   };
+
+  const handleBrandComplete = async () => {
+    await loadBrands();
+    setCurrentView("dashboard");
+  };
+
+  const handleAuthSuccess = () => {
+    setCurrentView("dashboard");
+  };
 
   const handleNavigate = (view: string) => {
     setCurrentView(view as View);
   };
 
   const handleGetStarted = () => {
-     if (user) {
-       setCurrentView("create-brand");
-     } else {
-       setCurrentView("auth");
-     }
+    if (user) {
+      setCurrentView("create-brand");
+    } else {
+      setCurrentView("auth");
+    }
   };
 
-   // Show loading spinner while checking auth
-   if (authLoading) {
-     return (
-       <div className="min-h-screen flex items-center justify-center">
-         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-       </div>
-     );
-   }
- 
-   // Show landing page when not authenticated and on landing view
-   if (currentView === "landing" && !user) {
+  // Show loading spinner while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Show landing page when not authenticated and on landing view
+  if (currentView === "landing" && !user) {
     return <LandingPage onGetStarted={handleGetStarted} />;
   }
- 
-   // Show auth page
-   if (currentView === "auth" && !user) {
-     return <AuthPage onSuccess={handleAuthSuccess} />;
-   }
- 
-   // Redirect to dashboard if user is authenticated and on landing/auth
-   if (user && (currentView === "landing" || currentView === "auth")) {
-     setCurrentView("dashboard");
-   }
+
+  // Show auth page
+  if (currentView === "auth" && !user) {
+    return <AuthPage onSuccess={handleAuthSuccess} />;
+  }
+
+  // Redirect to dashboard if user is authenticated and on landing/auth
+  if (user && (currentView === "landing" || currentView === "auth")) {
+    setCurrentView("dashboard");
+  }
+
+  const actionCards = [
+    {
+      icon: Rocket,
+      title: "Create a Post",
+      description: "Generate images, videos, and posts for your product or campaign.",
+      buttonText: "Create Post",
+      buttonVariant: "hero" as const,
+      action: () => setCurrentView("generate"),
+      available: brands.length > 0,
+    },
+    {
+      icon: Calendar,
+      title: "Add New Brand",
+      description: "Analyze another website to create a new brand bundle.",
+      buttonText: "Analyze Brand",
+      buttonVariant: "outline" as const,
+      action: () => setCurrentView("create-brand"),
+      available: true,
+    },
+    {
+      icon: Image,
+      title: "View Library",
+      description: "Browse and manage your previous creations.",
+      buttonText: "Coming Soon",
+      buttonVariant: "outline" as const,
+      action: undefined,
+      available: false,
+    },
+  ];
 
   return (
     <AppLayout 
       currentView={currentView} 
       onNavigate={handleNavigate}
-       hasBrand={brands.length > 0}
-       onSignOut={() => {
-         setBrands([]);
-         setSelectedBrand(null);
-         setCurrentView("landing");
-       }}
+      hasBrand={brands.length > 0}
+      onSignOut={() => {
+        setBrands([]);
+        setSelectedBrand(null);
+        setCurrentView("landing");
+      }}
     >
       <AnimatePresence mode="wait">
-         {currentView === "dashboard" && (
+        {currentView === "dashboard" && (
           <motion.div
             key="dashboard"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="container mx-auto px-4 py-8"
+            className="py-16"
           >
-             {loadingBrands ? (
-               <div className="flex items-center justify-center py-20">
-                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
-               </div>
-             ) : brands.length === 0 ? (
-               <div className="text-center py-20">
-                 <h2 className="text-2xl font-bold mb-4">Welcome to PostGen AI!</h2>
-                 <p className="text-muted-foreground mb-6">
-                   Create your first Brand Bundle to start generating on-brand content.
-                 </p>
-                 <Button variant="hero" onClick={() => setCurrentView("create-brand")}>
-                   Create Brand Bundle
-                   <ArrowRight className="w-5 h-5" />
-                 </Button>
-               </div>
-             ) : (
-               <>
-            {/* Quick Actions */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <GlassCard 
-                  className="cursor-pointer group"
-                  onClick={() => setCurrentView("generate")}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <Wand2 className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">Generate Posts</h3>
-                      <p className="text-sm text-muted-foreground">Create new on-brand content</p>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
-                </GlassCard>
+            <div className="container mx-auto px-4">
+              {loadingBrands ? (
+                <div className="flex items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
+              ) : (
+                <>
+                  {/* Main heading */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center mb-14"
+                  >
+                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+                      What do you want to create?
+                    </h1>
+                    <p className="text-lg text-muted-foreground">
+                      Let AI handle the content, while you focus on growth.
+                    </p>
+                  </motion.div>
 
-                <GlassCard className="cursor-pointer group" onClick={() => setCurrentView("create-brand")}>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                      <svg className="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
+                  {/* Action Cards */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16"
+                  >
+                    {actionCards.map((card, index) => {
+                      const Icon = card.icon;
+                      return (
+                        <motion.div
+                          key={card.title}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 + index * 0.1 }}
+                          className="group relative p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all duration-300"
+                        >
+                          {/* Icon */}
+                          <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center mb-5">
+                            <Icon className="w-7 h-7 text-primary" />
+                          </div>
+
+                          {/* Content */}
+                          <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                          <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                            {card.description}
+                          </p>
+
+                          {/* Button */}
+                          <Button
+                            variant={card.buttonVariant}
+                            className="w-full"
+                            onClick={card.action}
+                            disabled={!card.available}
+                          >
+                            {card.buttonText}
+                            {card.available && <ArrowRight className="w-4 h-4 ml-2" />}
+                          </Button>
+                        </motion.div>
+                      );
+                    })}
+                  </motion.div>
+
+                  {/* Brand Overview */}
+                  {selectedBrand && (
+                    <div className="max-w-4xl mx-auto">
+                      <h2 className="text-xl font-semibold mb-4">Your Brand Bundle</h2>
+                      <BrandOverview brand={selectedBrand} />
                     </div>
-                    <div className="flex-1">
-                       <h3 className="font-semibold">Add New Brand</h3>
-                       <p className="text-sm text-muted-foreground">Analyze another website</p>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-accent transition-colors" />
-                  </div>
-                </GlassCard>
-              </div>
+                  )}
+                </>
+              )}
             </div>
-
-            {/* Brand Overview */}
-               <div>
-                 <h2 className="text-xl font-semibold mb-4">Your Brand Bundle</h2>
-                 {selectedBrand && <BrandOverview brand={selectedBrand} />}
-               </div>
-               </>
-             )}
           </motion.div>
         )}
 
@@ -183,7 +225,7 @@ const Index = () => {
           >
             <BrandCreator 
               onComplete={handleBrandComplete}
-               onBack={() => setCurrentView(brands.length > 0 ? "dashboard" : "landing")}
+              onBack={() => setCurrentView(brands.length > 0 ? "dashboard" : "landing")}
             />
           </motion.div>
         )}
@@ -195,10 +237,10 @@ const Index = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-             <PostGenerator 
-               brand={selectedBrand}
-               onBack={() => setCurrentView("dashboard")} 
-             />
+            <PostGenerator 
+              brand={selectedBrand}
+              onBack={() => setCurrentView("dashboard")} 
+            />
           </motion.div>
         )}
 
@@ -218,13 +260,13 @@ const Index = () => {
               ← Back to Dashboard
             </Button>
             
-            <GlassCard className="max-w-2xl">
+            <div className="p-8 rounded-xl bg-card border border-border max-w-2xl">
               <h2 className="text-xl font-semibold mb-4">Settings</h2>
               <p className="text-muted-foreground">
                 Settings panel coming soon. Here you'll be able to manage your account, 
                 API connections, and brand preferences.
               </p>
-            </GlassCard>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

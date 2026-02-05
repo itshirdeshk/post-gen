@@ -1,108 +1,79 @@
-import { motion } from "framer-motion";
-import { Sparkles, Twitter, Linkedin, Github, Mail } from "lucide-react";
+import { Sparkles, Info } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const footerLinks = {
-  Product: [
-    { label: "Features", href: "#features" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "API", href: "#" },
-    { label: "Integrations", href: "#" },
-  ],
-  Company: [
-    { label: "About", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Careers", href: "#" },
-    { label: "Press", href: "#" },
-    { label: "Contact", href: "#" },
-  ],
-  Resources: [
-    { label: "Documentation", href: "#" },
-    { label: "Help Center", href: "#" },
-    { label: "Community", href: "#" },
-    { label: "Templates", href: "#" },
-    { label: "Guides", href: "#" },
-  ],
-  Legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
-    { label: "Cookie Policy", href: "#" },
-    { label: "GDPR", href: "#" },
-  ],
-};
+const footerLinks = [
+  { label: "About", href: "#" },
+  { label: "Blog", href: "#" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Pricing", href: "#pricing" },
+];
 
-const socialLinks = [
-  { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Github, href: "#", label: "GitHub" },
-  { icon: Mail, href: "#", label: "Email" },
+const platformLogos = [
+  { name: "Meta", icon: "∞" },
+  { name: "Instagram", icon: "📷" },
+  { name: "Facebook", icon: "f" },
+  { name: "Google Ads", icon: "▲" },
 ];
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/50 bg-secondary/20">
-      <div className="container px-4 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
-          {/* Brand column */}
-          <div className="col-span-2">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="flex items-center gap-2 mb-4"
+    <footer className="border-t border-border/50 bg-background">
+      {/* Platform logos */}
+      <div className="container px-4 py-8 border-b border-border/50">
+        <div className="flex flex-wrap items-center justify-center gap-8">
+          {platformLogos.map((platform) => (
+            <div
+              key={platform.name}
+              className="flex items-center gap-2 text-muted-foreground"
             >
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary" />
-              </div>
-              <span className="text-xl font-bold">PostGen</span>
-            </motion.div>
-            <p className="text-muted-foreground text-sm mb-6 max-w-xs">
-              Transform your brand into endless content with AI-powered social media generation.
-            </p>
-            
-            {/* Social links */}
-            <div className="flex gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center hover:bg-primary/20 hover:text-primary transition-colors"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
-          </div>
-          
-          {/* Link columns */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h4 className="font-semibold mb-4">{category}</h4>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-muted-foreground text-sm hover:text-foreground transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <span className="text-xl">{platform.icon}</span>
+              <span className="text-sm font-medium">{platform.name}</span>
             </div>
           ))}
         </div>
-        
-        {/* Bottom bar */}
-        <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} PostGen AI. All rights reserved.
-          </p>
-          <p className="text-muted-foreground text-sm">
-            Made with ❤️ for content creators worldwide
-          </p>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="container px-4 py-4">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* Left side - links */}
+          <div className="flex items-center gap-6">
+            {footerLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          {/* Center - email signup */}
+          <div className="flex items-center gap-2">
+            <input
+              type="email"
+              placeholder="Email"
+              className="px-4 py-2 text-sm rounded-lg bg-secondary border border-border focus:outline-none focus:border-primary w-48"
+            />
+            <Link
+              to="/waitlist"
+              className="px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Sign Up
+            </Link>
+          </div>
+
+          {/* Right side - help */}
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Info className="w-4 h-4" />
+              <span>Need Help?</span>
+              <a href="#" className="hover:text-foreground transition-colors">
+                Learn More
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
