@@ -9,22 +9,22 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-glow active:scale-[0.98]",
+        default: "bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98]",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.98]",
-        outline: "border border-border bg-transparent hover:bg-secondary hover:border-primary/50 active:scale-[0.98]",
+        outline: "border border-border bg-transparent hover:bg-secondary active:scale-[0.98]",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-[0.98]",
         ghost: "hover:bg-secondary hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        // Hero button with gradient glow
-        hero: "bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-glow hover:shadow-[0_0_50px_hsl(var(--primary)/0.4)] active:scale-[0.98]",
+        // Hero button with glow
+        hero: "bg-primary text-primary-foreground shadow-glow hover:opacity-90 active:scale-[0.98]",
         // Glass button
-        glass: "glass border-0 hover:bg-secondary/50 active:scale-[0.98]",
+        glass: "bg-secondary/50 border border-border hover:bg-secondary active:scale-[0.98]",
         // Success variant
         success: "bg-success text-success-foreground hover:bg-success/90 active:scale-[0.98]",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3 text-xs",
+        sm: "h-9 rounded-lg px-3 text-xs",
         lg: "h-12 rounded-xl px-8 text-base",
         xl: "h-14 rounded-xl px-10 text-lg font-semibold",
         icon: "h-10 w-10",

@@ -1,16 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  Menu, 
-  X, 
-  Sparkles,
-  LayoutDashboard,
-  FileText,
-  Settings,
-  LogOut,
-  ChevronRight,
-  Info
-} from "lucide-react";
+import { Menu, X, LogOut, ChevronRight, Coins, Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -38,23 +28,23 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignO
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background dark">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+      <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Nav */}
             <div className="flex items-center gap-8">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-primary-foreground" />
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-sm">P</span>
                 </div>
-                <span className="font-bold text-lg">PostGen</span>
+                <span className="font-semibold text-lg text-foreground">PostGen</span>
               </div>
 
               {/* Desktop Nav Tabs */}
               <div className="hidden md:flex items-center">
-                <div className="h-8 w-px bg-border mr-6" />
+                <div className="h-6 w-px bg-border mr-6" />
                 <div className="flex items-center gap-1">
                   {NAV_ITEMS.map((item) => {
                     const isActive = currentView === item.id;
@@ -65,12 +55,12 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignO
                         key={item.id}
                         onClick={() => !isDisabled && onNavigate?.(item.id)}
                         disabled={isDisabled}
-                        className={`px-4 py-2 text-sm font-medium transition-colors rounded-md ${
+                        className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg ${
                           isActive 
-                            ? "text-foreground border-b-2 border-primary" 
+                            ? "bg-secondary text-foreground" 
                             : isDisabled
                             ? "text-muted-foreground/50 cursor-not-allowed"
-                            : "text-muted-foreground hover:text-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                         }`}
                       >
                         {item.label}
@@ -82,7 +72,23 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignO
             </div>
 
             {/* Right side */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              {/* Credits */}
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-sm">
+                <Coins className="w-4 h-4 text-primary" />
+                <span className="font-medium text-foreground">1,000</span>
+              </div>
+              
+              {/* Notifications */}
+              <Button variant="ghost" size="icon" className="hidden md:flex">
+                <Bell className="w-5 h-5 text-muted-foreground" />
+              </Button>
+              
+              {/* Profile */}
+              <Button variant="ghost" size="icon" className="hidden md:flex">
+                <User className="w-5 h-5 text-muted-foreground" />
+              </Button>
+
               {user && (
                 <Button
                   variant="ghost"
@@ -114,7 +120,7 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignO
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="md:hidden border-t border-border/50"
+            className="md:hidden border-t border-border bg-card"
           >
             <nav className="container mx-auto px-4 py-4 space-y-1">
               {NAV_ITEMS.map((item) => {
@@ -131,7 +137,7 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignO
                       }
                     }}
                     disabled={isDisabled}
-                    className={`flex items-center justify-between w-full px-4 py-3 rounded-lg transition-all ${
+                    className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all ${
                       isActive 
                         ? "bg-primary/10 text-primary" 
                         : isDisabled
@@ -151,7 +157,7 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignO
                    handleSignOut();
                    setMobileMenuOpen(false);
                  }}
-                 className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+                 className="flex items-center justify-between w-full px-4 py-3 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
                >
                  <div className="flex items-center gap-3">
                    <LogOut className="w-5 h-5" />
@@ -169,22 +175,6 @@ export function AppLayout({ children, currentView, onNavigate, hasBrand, onSignO
       <main className="flex-1">
         {children}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-4 px-4">
-        <div className="container mx-auto flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Info className="w-4 h-4" />
-            <span>Need Help?</span>
-            <a href="#" className="hover:text-foreground transition-colors">
-              Learn More
-            </a>
-          </div>
-          <div>
-            © 2025 PostGen AI
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

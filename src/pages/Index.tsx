@@ -7,7 +7,7 @@ import { BrandCreator } from "@/components/brand/BrandCreator";
 import { BrandOverview } from "@/components/brand/BrandOverview";
 import { PostGenerator } from "@/components/post/PostGenerator";
 import { Button } from "@/components/ui/button";
-import { Wand2, ArrowRight, Loader2, Rocket, Calendar, Image } from "lucide-react";
+import { ArrowRight, Loader2, Rocket, Calendar, Image } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchBrandBundles } from "@/lib/api/brand";
 import type { BrandBundle } from "@/types/brand";
@@ -92,30 +92,30 @@ const Index = () => {
   const actionCards = [
     {
       icon: Rocket,
-      title: "Create a Post",
+      title: "Create an Ad",
       description: "Generate images, videos, and posts for your product or campaign.",
-      buttonText: "Create Post",
-      buttonVariant: "hero" as const,
+      buttonText: "Create Ad",
+      isPrimary: true,
       action: () => setCurrentView("generate"),
       available: brands.length > 0,
     },
     {
       icon: Calendar,
-      title: "Add New Brand",
-      description: "Analyze another website to create a new brand bundle.",
-      buttonText: "Analyze Brand",
-      buttonVariant: "outline" as const,
-      action: () => setCurrentView("create-brand"),
-      available: true,
+      title: "Create a Campaign",
+      description: "Plan and auto-generate entire marketing campaigns.",
+      buttonText: "Coming Soon",
+      isPrimary: false,
+      action: undefined,
+      available: false,
     },
     {
       icon: Image,
       title: "View Library",
       description: "Browse and manage your previous creations.",
-      buttonText: "Coming Soon",
-      buttonVariant: "outline" as const,
-      action: undefined,
-      available: false,
+      buttonText: "Go to Library",
+      isPrimary: false,
+      action: () => setCurrentView("create-brand"),
+      available: true,
     },
   ];
 
@@ -152,7 +152,7 @@ const Index = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-14"
                   >
-                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-foreground">
                       What do you want to create?
                     </h1>
                     <p className="text-lg text-muted-foreground">
@@ -175,23 +175,23 @@ const Index = () => {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 + index * 0.1 }}
-                          className="group relative p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all duration-300"
+                          className="group p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all hover-lift"
                         >
                           {/* Icon */}
-                          <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center mb-5">
+                          <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
                             <Icon className="w-7 h-7 text-primary" />
                           </div>
 
                           {/* Content */}
-                          <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                          <h3 className="text-xl font-semibold mb-2 text-foreground">{card.title}</h3>
                           <p className="text-muted-foreground text-sm leading-relaxed mb-6">
                             {card.description}
                           </p>
 
                           {/* Button */}
                           <Button
-                            variant={card.buttonVariant}
-                            className="w-full"
+                            variant={card.isPrimary ? "default" : "outline"}
+                            className="w-full rounded-xl"
                             onClick={card.action}
                             disabled={!card.available}
                           >
@@ -206,7 +206,7 @@ const Index = () => {
                   {/* Brand Overview */}
                   {selectedBrand && (
                     <div className="max-w-4xl mx-auto">
-                      <h2 className="text-xl font-semibold mb-4">Your Brand Bundle</h2>
+                      <h2 className="text-xl font-semibold mb-4 text-foreground">Your Brand Bundle</h2>
                       <BrandOverview brand={selectedBrand} />
                     </div>
                   )}
@@ -260,8 +260,8 @@ const Index = () => {
               ← Back to Dashboard
             </Button>
             
-            <div className="p-8 rounded-xl bg-card border border-border max-w-2xl">
-              <h2 className="text-xl font-semibold mb-4">Settings</h2>
+            <div className="p-8 rounded-2xl bg-card border border-border max-w-2xl">
+              <h2 className="text-xl font-semibold mb-4 text-foreground">Settings</h2>
               <p className="text-muted-foreground">
                 Settings panel coming soon. Here you'll be able to manage your account, 
                 API connections, and brand preferences.

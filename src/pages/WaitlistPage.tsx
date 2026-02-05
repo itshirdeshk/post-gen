@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight, CheckCircle, Mail, Rocket, Calendar, Zap, Info } from "lucide-react";
+import { ArrowRight, CheckCircle, Mail, Rocket, Calendar, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { GradientText } from "@/components/ui/GradientText";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
@@ -80,15 +79,15 @@ export function WaitlistPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col dark">
       {/* Header Navigation */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <header className="border-b border-border bg-background">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-foreground" />
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">P</span>
             </div>
-            <span className="font-bold text-lg">PostGen AI</span>
+            <span className="font-semibold text-lg text-foreground">PostGen</span>
           </Link>
           
           <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -100,11 +99,9 @@ export function WaitlistPage() {
             </span>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/">Back to Home</Link>
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" asChild className="rounded-lg">
+            <Link to="/">Back to Home</Link>
+          </Button>
         </div>
       </header>
 
@@ -118,9 +115,9 @@ export function WaitlistPage() {
             transition={{ duration: 0.5 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 text-foreground">
               What do you want to{" "}
-              <GradientText>create?</GradientText>
+              <span className="gradient-text">create?</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
               Join our waitlist to be first in line when we launch.
@@ -142,17 +139,17 @@ export function WaitlistPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
-                  className="group relative p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all duration-300"
+                  className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all hover-lift"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                     <Icon className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">{feature.title}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     {feature.description}
                   </p>
                   <div className="mt-4">
-                    <span className="inline-flex items-center text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-secondary/50 border border-border">
+                    <span className="inline-flex items-center text-xs font-medium text-muted-foreground px-3 py-1.5 rounded-full bg-secondary border border-border">
                       Coming Soon
                     </span>
                   </div>
@@ -168,13 +165,13 @@ export function WaitlistPage() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="max-w-md mx-auto"
           >
-            <div className="p-8 rounded-xl bg-card border border-border">
+            <div className="p-8 rounded-2xl bg-card border border-border">
               {isSuccess ? (
                 <div className="text-center py-6">
                   <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-8 h-8 text-success" />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-2">You're on the list!</h3>
+                  <h3 className="text-2xl font-semibold mb-2 text-foreground">You're on the list!</h3>
                   <p className="text-muted-foreground">
                     We'll send you an email when PostGen AI is ready for you.
                   </p>
@@ -182,7 +179,7 @@ export function WaitlistPage() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="text-center">
-                    <h3 className="text-2xl font-semibold mb-2">Get Early Access</h3>
+                    <h3 className="text-2xl font-semibold mb-2 text-foreground">Get Early Access</h3>
                     <p className="text-sm text-muted-foreground">
                       Be the first to know when we launch
                     </p>
@@ -195,16 +192,15 @@ export function WaitlistPage() {
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-12 h-12 bg-secondary/50 border-border focus:border-primary"
+                      className="pl-12 h-12 bg-input border-border rounded-xl focus:border-primary focus:ring-primary"
                       disabled={isSubmitting}
                     />
                   </div>
                   
                   <Button
                     type="submit"
-                    variant="hero"
                     size="lg"
-                    className="w-full"
+                    className="w-full rounded-xl h-12"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -212,7 +208,7 @@ export function WaitlistPage() {
                     ) : (
                       <>
                         Join Waitlist
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight className="w-5 h-5 ml-2" />
                       </>
                     )}
                   </Button>
@@ -228,18 +224,9 @@ export function WaitlistPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-4 px-4">
-        <div className="container mx-auto flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Info className="w-4 h-4" />
-            <span>Need Help?</span>
-            <Link to="/" className="hover:text-foreground transition-colors">
-              Learn More
-            </Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <span>© 2025 PostGen AI</span>
-          </div>
+      <footer className="border-t border-border py-4 px-4">
+        <div className="container mx-auto flex items-center justify-center text-sm text-muted-foreground">
+          <span>© 2025 PostGen AI</span>
         </div>
       </footer>
     </div>
