@@ -5,7 +5,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { GradientText } from "@/components/ui/GradientText";
 
 const faqs = [
   {
@@ -32,20 +31,12 @@ const faqs = [
     question: "Is my brand data secure?",
     answer: "Yes, security is our top priority. All data is encrypted at rest and in transit. We're SOC 2 compliant and never share or use your brand data to train models for other users.",
   },
-  {
-    question: "Can I cancel my subscription anytime?",
-    answer: "Yes, you can cancel your subscription at any time with no questions asked. Your access will continue until the end of your billing period.",
-  },
-  {
-    question: "Do you offer a free trial?",
-    answer: "Yes! Our Starter plan is completely free with generous limits. For Pro features, we offer a 14-day free trial so you can experience the full power of PostGen before committing.",
-  },
 ];
 
 export function FAQ() {
   return (
     <section className="py-24" id="faq">
-      <div className="container px-4 max-w-4xl">
+      <div className="container px-4 max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -53,10 +44,10 @@ export function FAQ() {
           className="text-center mb-16"
         >
           <span className="text-primary text-sm font-medium tracking-wider uppercase">FAQ</span>
-          <h2 className="text-3xl md:text-5xl font-bold mt-4 mb-6">
-            Frequently Asked <GradientText>Questions</GradientText>
+          <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-4 text-foreground">
+            Frequently asked questions
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground">
             Got questions? We've got answers.
           </p>
         </motion.div>
@@ -66,17 +57,17 @@ export function FAQ() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <Accordion type="single" collapsible className="space-y-4">
+          <Accordion type="single" collapsible className="space-y-3">
             {faqs.map((faq, index) => (
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="glass-card px-6 border-none"
+                className="rounded-xl bg-card border border-border px-6"
               >
-                <AccordionTrigger className="text-left hover:no-underline py-6">
-                  <span className="font-semibold">{faq.question}</span>
+                <AccordionTrigger className="text-left hover:no-underline py-5 text-foreground">
+                  <span className="font-medium">{faq.question}</span>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-6">
+                <AccordionContent className="text-muted-foreground pb-5">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

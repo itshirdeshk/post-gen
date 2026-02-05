@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GradientText } from "@/components/ui/GradientText";
 
 const plans = [
   {
@@ -66,15 +65,15 @@ export function Pricing() {
           className="text-center mb-16"
         >
           <span className="text-primary text-sm font-medium tracking-wider uppercase">Pricing</span>
-          <h2 className="text-3xl md:text-5xl font-bold mt-4 mb-6">
-            Simple, <GradientText>Transparent Pricing</GradientText>
+          <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-4 text-foreground">
+            Simple, transparent pricing
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Start free, upgrade when you're ready. No hidden fees, no surprises.
+          <p className="text-muted-foreground max-w-lg mx-auto">
+            Start free, upgrade when you're ready. No hidden fees.
           </p>
         </motion.div>
         
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -82,11 +81,13 @@ export function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className={`relative glass-card p-8 ${plan.popular ? 'border-primary/50 scale-105' : ''}`}
+              className={`relative rounded-2xl bg-card border shadow-sm p-8 ${
+                plan.popular ? 'border-primary shadow-lg scale-105 z-10' : 'border-border'
+              }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                  <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-medium">
                     <Sparkles className="w-3 h-3" />
                     Most Popular
                   </div>
@@ -94,9 +95,9 @@ export function Pricing() {
               )}
               
               <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
+                <h3 className="text-xl font-semibold mb-2 text-foreground">{plan.name}</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold">{plan.price}</span>
+                  <span className="text-4xl font-bold text-foreground">{plan.price}</span>
                   {plan.period && <span className="text-muted-foreground">{plan.period}</span>}
                 </div>
                 <p className="text-muted-foreground text-sm mt-2">{plan.description}</p>
@@ -104,7 +105,7 @@ export function Pricing() {
               
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm">
+                  <li key={feature} className="flex items-center gap-3 text-sm text-foreground">
                     <Check className="w-4 h-4 text-primary shrink-0" />
                     <span>{feature}</span>
                   </li>
@@ -112,8 +113,8 @@ export function Pricing() {
               </ul>
               
               <Button 
-                className="w-full" 
-                variant={plan.popular ? "hero" : "outline"}
+                className={`w-full rounded-lg ${plan.popular ? '' : ''}`}
+                variant={plan.popular ? "default" : "outline"}
               >
                 {plan.cta}
               </Button>

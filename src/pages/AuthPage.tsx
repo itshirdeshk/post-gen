@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -58,15 +58,15 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col dark">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
+      <header className="border-b border-border bg-background">
+        <div className="container mx-auto px-4 h-16 flex items-center">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">P</span>
             </div>
-            <span className="font-bold text-lg">PostGen</span>
+            <span className="font-semibold text-lg text-foreground">PostGen</span>
           </Link>
         </div>
       </header>
@@ -79,7 +79,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-3xl font-bold mb-2">
+            <h1 className="text-3xl font-bold mb-2 text-foreground">
               {mode === "signin" ? "Welcome back" : "Get started"}
             </h1>
             <p className="text-muted-foreground">
@@ -93,7 +93,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-8 rounded-xl bg-card border border-border"
+            className="p-8 rounded-2xl bg-card border border-border"
           >
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
@@ -103,7 +103,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 h-12 bg-secondary/50 border-border focus:border-primary"
+                  className="pl-12 h-12 bg-input border-border rounded-xl focus:border-primary focus:ring-primary"
                   required
                 />
               </div>
@@ -115,7 +115,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 pr-12 h-12 bg-secondary/50 border-border focus:border-primary"
+                  className="pl-12 pr-12 h-12 bg-input border-border rounded-xl focus:border-primary focus:ring-primary"
                   required
                   minLength={6}
                 />
@@ -130,9 +130,8 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
 
               <Button 
                 type="submit" 
-                variant="hero" 
                 size="lg" 
-                className="w-full"
+                className="w-full rounded-xl h-12"
                 disabled={loading}
               >
                 {loading ? (
@@ -140,7 +139,7 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
                 ) : (
                   <>
                     {mode === "signin" ? "Sign In" : "Create Account"}
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}
               </Button>

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Rocket, Calendar, Image, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DashboardHeroProps {
@@ -7,120 +7,95 @@ interface DashboardHeroProps {
   hasBrand?: boolean;
 }
 
-const actionCards = [
-  {
-    icon: Rocket,
-    title: "Create a Post",
-    description: "Generate images, videos, and posts for your product or campaign.",
-    buttonText: "Create Post",
-    buttonVariant: "hero" as const,
-    available: true,
-  },
-  {
-    icon: Calendar,
-    title: "Create a Campaign",
-    description: "Plan and auto-generate entire marketing campaigns.",
-    buttonText: "Coming Soon",
-    buttonVariant: "outline" as const,
-    available: false,
-  },
-  {
-    icon: Image,
-    title: "View Library",
-    description: "Browse and manage your previous creations.",
-    buttonText: "Go to Library",
-    buttonVariant: "outline" as const,
-    available: true,
-  },
-];
-
-export function DashboardHero({ onCreateBrand, hasBrand }: DashboardHeroProps) {
+export function DashboardHero({ onCreateBrand }: DashboardHeroProps) {
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-20 md:py-28 landing-bg">
       <div className="container px-4">
-        {/* Main heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
-            What do you want to create?
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Let AI handle the content, while you focus on growth.
-          </p>
-        </motion.div>
-
-        {/* Action Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto"
-        >
-          {actionCards.map((card, index) => {
-            const Icon = card.icon;
-            return (
-              <motion.div
-                key={card.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + index * 0.1 }}
-                className="group relative p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all duration-300"
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground mb-6">
+              Create ads, content, and campaigns with AI —{" "}
+              <span className="gradient-text">end to end.</span>
+            </h1>
+            <p className="text-lg text-muted-foreground mb-8 max-w-xl">
+              Generate stunning visuals, compelling copy, and ready-to-publish content 
+              for all your marketing channels in minutes.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button 
+                size="lg" 
+                onClick={onCreateBrand}
+                className="rounded-lg text-base px-8 py-6 group"
               >
-                {/* Icon */}
-                <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center mb-5">
-                  <Icon className="w-7 h-7 text-primary" />
+                Get Started — It's Free
+                <ArrowRight className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="rounded-lg text-base px-8 py-6"
+              >
+                Watch Demo
+              </Button>
+            </div>
+          </motion.div>
+
+          {/* Right - App Mockup */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="relative"
+          >
+            <div className="relative bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
+              {/* Mock App Header */}
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-secondary/30">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-destructive/60" />
+                  <div className="w-3 h-3 rounded-full bg-warning/60" />
+                  <div className="w-3 h-3 rounded-full bg-success/60" />
                 </div>
-
-                {/* Content */}
-                <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                  {card.description}
-                </p>
-
-                {/* Button */}
-                <Button
-                  variant={card.buttonVariant}
-                  className="w-full"
-                  onClick={card.available ? onCreateBrand : undefined}
-                  disabled={!card.available}
-                >
-                  {card.buttonText}
-                  {card.available && <ArrowRight className="w-4 h-4 ml-2" />}
-                </Button>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-
-        {/* Stats Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex flex-wrap justify-center gap-12 mt-20 pt-12 border-t border-border/50"
-        >
-          <StatItem value="500+" label="Brands Analyzed" />
-          <StatItem value="50K+" label="Posts Generated" />
-          <StatItem value="98%" label="Satisfaction Rate" />
-        </motion.div>
+                <div className="flex-1 flex justify-center">
+                  <div className="px-4 py-1 bg-secondary rounded-md text-xs text-muted-foreground">
+                    postgen.app
+                  </div>
+                </div>
+              </div>
+              
+              {/* Mock App Content */}
+              <div className="p-6 space-y-4">
+                <div className="text-center mb-6">
+                  <h3 className="font-semibold text-foreground">What do you want to create?</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-4 rounded-xl bg-secondary/50 border border-border">
+                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center mb-2">
+                      <div className="w-4 h-4 bg-primary rounded" />
+                    </div>
+                    <div className="text-sm font-medium text-foreground">Create an Ad</div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-secondary/50 border border-border">
+                    <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center mb-2">
+                      <div className="w-4 h-4 bg-accent rounded" />
+                    </div>
+                    <div className="text-sm font-medium text-foreground">Create Post</div>
+                  </div>
+                </div>
+                <div className="h-24 rounded-xl bg-secondary/30 border border-border" />
+              </div>
+            </div>
+            
+            {/* Floating decoration */}
+            <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
+            <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-accent/10 rounded-full blur-2xl" />
+          </motion.div>
+        </div>
       </div>
     </section>
-  );
-}
-
-interface StatItemProps {
-  value: string;
-  label: string;
-}
-
-function StatItem({ value, label }: StatItemProps) {
-  return (
-    <div className="text-center">
-      <div className="text-3xl md:text-4xl font-bold text-foreground">{value}</div>
-      <div className="text-sm text-muted-foreground mt-1">{label}</div>
-    </div>
   );
 }
