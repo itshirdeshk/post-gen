@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Sparkles, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useState } from "react";
 
@@ -58,6 +59,13 @@ export function LandingNav({ onGetStarted }: LandingNavProps) {
               Sign In
             </Button>
             <Button 
+              variant="outline" 
+              className="hidden md:inline-flex"
+              asChild
+            >
+              <Link to="/waitlist">Join Waitlist</Link>
+            </Button>
+            <Button 
               variant="hero" 
               className="hidden md:inline-flex"
               onClick={onGetStarted}
@@ -98,6 +106,9 @@ export function LandingNav({ onGetStarted }: LandingNavProps) {
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border/50">
                 <Button variant="ghost">Sign In</Button>
+                <Button variant="outline" asChild>
+                  <Link to="/waitlist">Join Waitlist</Link>
+                </Button>
                 <Button variant="hero" onClick={onGetStarted}>Get Started</Button>
               </div>
             </div>
